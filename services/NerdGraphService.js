@@ -12,13 +12,13 @@ const headers = () => {
   };
 }
 
-const runNRQL = async (nrql, account) => {
+const runNRQL = async (nrql, accounts) => {
   console.log(nrql);
   var graphql_query = {
     query: `
         {
             actor {
-              nrql(query: "${nrql}", accounts: ${account}) {
+              nrql(query: "${nrql}", accounts: [${accounts.join(', ')}]) {
                 results
                 totalResult
               }
@@ -55,9 +55,43 @@ const getAccounts = async () => {
   return resp?.data?.data?.actor?.accounts;
 }
 
+const getAlertPolicies = async (accountId) => {
+
+  var graphql = { query: `{\n  actor {\n    account(id: ${accountId}) {\n      alerts {\n        policiesSearch {\n          nextCursor\n          policies {\n            id\n            accountId\n            incidentPreference\n            name\n          }\n        }\n      }\n    }\n  }\n}`, variables: null };
+
+  var resp;
+  resp = await axios({
+    url: 'https://api.newrelic.com/graphql',
+    method: 'post',
+    headers: headers(),
+    data: graphql
+  }).catch((e) => {
+    console.log('GraphQL account lookup error:', e.message);
+  });
+
+  return resp?.data?.data?.actor?.account?.alerts?.policiesSearch?.policies;
+}
+
+const getNotificationChannels = async (accountId) => {
+
+  var graphql = { query: `{\n  actor {\n    account(id: ${accountId}) {\n      alerts {\n        notificationChannels {\n          totalCount\n          channels {\n            id\n            name\n            type\n            associatedPolicies {\n              policies {\n                id\n                name\n              }\n              totalCount\n            }\n          }\n          nextCursor\n        }\n      }\n    }\n  }\n}\n`, variables: null };
+
+  var resp;
+  resp = await axios({
+    url: 'https://api.newrelic.com/graphql',
+    method: 'post',
+    headers: headers(),
+    data: graphql
+  }).catch((e) => {
+    console.log('GraphQL account lookup error:', e.message);
+  });
+
+  return resp?.data?.data?.actor?.account?.alerts?.notificationChannels?.channels;
+}
 
 
 
 
 
-export default { runNRQL, getAccounts };
+
+export default { runNRQL, getAccounts, getAlertPolicies, getNotificationChannels };

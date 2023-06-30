@@ -1,5 +1,5 @@
 {
-  "name": "cross-account-agent",
+  "name": "cross-account-processor",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
