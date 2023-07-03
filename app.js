@@ -10,8 +10,9 @@ const run = async () => {
 
   // const emails = { };
   const emails = {};
-
-  for(const account of accounts.slice(2,7)) {
+  
+  // for(const account of accounts.slice(2,7)) {
+  for(const account of accounts) {
     console.log("Processing reports for account", account.name);
     let accountId = account.id;
     // let policies = await NerdGraphService.getAlertPolicies(accountId);
