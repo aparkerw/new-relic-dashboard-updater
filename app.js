@@ -11,7 +11,7 @@ const run = async () => {
   // const emails = { };
   const emails = {};
 
-  for(const account of accounts.slice(3,7)) {
+  for(const account of accounts.slice(2,7)) {
     console.log("Processing reports for account", account.name);
     let accountId = account.id;
     // let policies = await NerdGraphService.getAlertPolicies(accountId);
@@ -27,17 +27,30 @@ const run = async () => {
   }
     
   
+  // add the email channels to our email destination check
   for(const ec of Object.values(notificationChannelProcessor.reporter.emails)) {
     if (!emails[ec.key]) {
       emails[ec.key] = ec.policyIds;
-      console.log('mmmm', emails[ec.key]);
     }
     else {
-      console.log('wwwwwww');
+      emails[ec.key] = emails[ec.key].concat(ec.policyIds);
+    }
+  }
+
+  // add the user channels to our email destination check
+  for(const uc of Object.values(notificationChannelProcessor.reporter.users)) {
+    if (!emails[uc.key]) {
+      emails[uc.key] = uc.policyIds;
+    }
+    else {
+      emails[uc.key] = emails[uc.key].concat(uc.policyIds);
     }
   }
   
   console.log(emails);
+
+  console.log('\n===============================\n');
+
   // let's output the emails that are on the same policy twice
   console.log("Emails on one policy twice");
   let offenders = [];
@@ -48,6 +61,20 @@ const run = async () => {
     }
   }
   console.log(offenders);
+  
+  console.log('\n===============================\n');
+
+  console.log("Orphaned Channels (channels without a policy)");
+  console.log(notificationChannelProcessor.reporter.orphans.map((o) => {
+    return { name: o.name, type: o.type };
+  }));
+
+  console.log('\n===============================\n');
+
+  console.log("User Channels to not migrate");
+  console.log(Object.values(notificationChannelProcessor.reporter.users).map((u) => {
+    return { name: u.name, email: u.email };
+  }));
 }
 
 run();
