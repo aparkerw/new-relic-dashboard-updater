@@ -2,16 +2,16 @@ import "dotenv/config.js";
 import NRQLService from "./services/NRQLService.js";
 import NerdGraphService from "./services/NerdGraphService.js";
 import { MetricNames, SinceTimeRange, SeriesIntervalTimeRange, AggregateFunctions } from "./Variables.js";
-import alertsWithEmails from "./services/reports/alerts-with-emails.js";
+import notificationChannelProcessor from "./services/reports/notificationChannelProcessor.js";
 
 const run = async () => {
   let accounts = await NerdGraphService.getAccounts();
   console.log(accounts);
 
   // const emails = { };
-  const emails = { 'aaron+prodtest@newrelic.com': [ 'Aaron - NRQL Baselines' ] };
+  const emails = {};
 
-  for(const account of accounts) {
+  for(const account of accounts.slice(3,7)) {
     console.log("Processing reports for account", account.name);
     let accountId = account.id;
     // let policies = await NerdGraphService.getAlertPolicies(accountId);
@@ -22,29 +22,22 @@ const run = async () => {
     // }
 
 
-    let accountAlertEmails = await alertsWithEmails.run(accountId);
-
-    
-    let notificationChannels = await NerdGraphService.getNotificationChannels(accountId);
-    // console.log(notificationChannels);
-
-    if (notificationChannels) {
-      let associatedEmailChannels = notificationChannels.filter(c => c.associatedPolicies.totalCount > 0 && c.type === 'EMAIL');
-      
-      for(const [key, value] of Object.entries(accountAlertEmails)) {
-        if (!emails[key]) {
-          emails[key] = value;
-        } else {
-          emails[key] = emails[key].concat(value);
-        }
-        
-      }
-    }
+    await notificationChannelProcessor.run(accountId);
     
   }
     
+  
+  for(const ec of Object.values(notificationChannelProcessor.reporter.emails)) {
+    if (!emails[ec.key]) {
+      emails[ec.key] = ec.policyIds;
+      console.log('mmmm', emails[ec.key]);
+    }
+    else {
+      console.log('wwwwwww');
+    }
+  }
+  
   console.log(emails);
-
   // let's output the emails that are on the same policy twice
   console.log("Emails on one policy twice");
   let offenders = [];

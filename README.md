@@ -1,6 +1,10 @@
+# WORK IN PROGRESS
+
+**This project is in development and will be changing to provide common cross-account query examples and to make modification for any future use case easer to implement**
+
 # NRQL + Nerdgraph Sample Application
 
-The purpose of this applicaiton is to showcase the ability to get NRQL data from Nerdgraph. In a way that is easy to request and consume for common external dashboard use cases.
+The purpose of this applicaiton is to showcase the ability execute nerdgraph queries accross multiple account that a user is associated with.
 
 https://developer.newrelic.com/build-apps/add-nerdgraphquery-guide/
 
@@ -40,75 +44,6 @@ If you choose to add your key inline instead of via the `.env` file you can run:
 NEW_RELIC_API_KEY=NRAK-ABCDABCDABCD npm start
 ```
 
-The results you will see should be an overview of the types of queries and output you can expect from this demonstrative application.
-
-### Web Dashboard Demo 
-
-This demo also includes a sample web dashboard that includes a React frontend and an express backend. This will demonstrate the retrieval and consumption of New Relic data to display a UI.
-
-To start the web server locally on port 3000 you can run:
-
-```
-npm run start:frontend
-```
-
-To start the api server on port 3001 you can run:
-
-```
-npm run start:backend
-```
-
-### Output
-
-```JSON
-[
-  {
-    beginTimeSeconds: 1686107700,
-    endTimeSeconds: 1686129300,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.38646153846153847
-  },
-  {
-    beginTimeSeconds: 1686129300,
-    endTimeSeconds: 1686150900,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.46116666666666667
-  },
-  {
-    beginTimeSeconds: 1686150900,
-    endTimeSeconds: 1686172500,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.48193749999999996
-  },
-  {
-    beginTimeSeconds: 1686172500,
-    endTimeSeconds: 1686194100,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.4366428571428571
-  },
-  {
-    beginTimeSeconds: 1686194100,
-    endTimeSeconds: 1686215700,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.3517142857142857
-  },
-  {
-    beginTimeSeconds: 1686215700,
-    endTimeSeconds: 1686237300,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.47259999999999996
-  },
-  {
-    beginTimeSeconds: 1686237300,
-    endTimeSeconds: 1686258900,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.39641666666666664
-  },
-  {
-    beginTimeSeconds: 1686258900,
-    endTimeSeconds: 1686280500,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.5407272727272727
-  },
-  {
-    beginTimeSeconds: 1686280500,
-    endTimeSeconds: 1686302100,
-    'average.newrelic.goldenmetrics.browser.application.pageLoadSeconds': 0.4658666666666667
-  }
-]
-```
 
 ## Architecture
 

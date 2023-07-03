@@ -72,9 +72,9 @@ const getAlertPolicies = async (accountId) => {
   return resp?.data?.data?.actor?.account?.alerts?.policiesSearch?.policies;
 }
 
-const getNotificationChannels = async (accountId) => {
+const getNotificationChannels = async (accountId, cursor) => {
 
-  var graphql = { query: `{\n  actor {\n    account(id: ${accountId}) {\n      alerts {\n        notificationChannels {\n          totalCount\n          channels {\n            id\n            name\n            type\n            associatedPolicies {\n              policies {\n                id\n                name\n              }\n              totalCount\n            }\n          }\n          nextCursor\n        }\n      }\n    }\n  }\n}\n`, variables: null };
+  var graphql = { query: `{\n  actor {\n    account(id: ${accountId}) {\n      alerts {\n        notificationChannels${cursor ? `(cursor:"${cursor}")` : ''} {\n          nextCursor\n          totalCount\n          channels {\n            id\n            name\n            type\n            associatedPolicies {\n              policies {\n                id\n                name\n              }\n              totalCount\n            }\n          }\n          nextCursor\n        }\n      }\n    }\n  }\n}\n`, variables: null };
 
   var resp;
   resp = await axios({
@@ -86,7 +86,23 @@ const getNotificationChannels = async (accountId) => {
     console.log('GraphQL account lookup error:', e.message);
   });
 
-  return resp?.data?.data?.actor?.account?.alerts?.notificationChannels?.channels;
+  const alerts = resp?.data?.data?.actor?.account?.alerts;
+  const notificationChannels = alerts?.notificationChannels;
+  const nextCursor = notificationChannels?.nextCursor;
+
+  console.log('next cursor', nextCursor);
+  console.log('loaded: ', notificationChannels?.channels.length);
+  console.log('total channels', notificationChannels?.totalCount);
+
+  let channels = notificationChannels?.channels || [];
+
+  if (nextCursor) {
+    let newChannels = await getNotificationChannels(accountId, nextCursor);
+    channels.concat(newChannels);
+  }
+
+
+  return channels;
 }
 
 
