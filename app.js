@@ -67,15 +67,22 @@ const run = async () => {
 
   console.log("Orphaned Channels (channels without a policy)");
   console.log(notificationChannelProcessor.reporter.orphans.map((o) => {
-    return { name: o.name, type: o.type };
+    return { name: o.name, type: o.type, accountId: o.accountId };
   }));
 
   console.log('\n===============================\n');
 
+  console.log("Orphaned Channels NON USER (channels without a policy)");
+  console.log(JSON.stringify(notificationChannelProcessor.reporter.orphans.filter(o => o.type !== 'USER').map((o) => {
+    return { name: o.name, type: o.type, accountId: o.accountId };
+  })));
+
+  console.log('\n===============================\n');
+
   console.log("User Channels to not migrate");
-  console.log(Object.values(notificationChannelProcessor.reporter.users).map((u) => {
-    return { name: u.name, email: u.email };
-  }));
+  console.log(JSON.stringify(Object.values(notificationChannelProcessor.reporter.users).map((u) => {
+    return { name: u.name, email: u.email, policyIds: u.policyIds, accountid: u.accountId };
+  })));
 }
 
 run();

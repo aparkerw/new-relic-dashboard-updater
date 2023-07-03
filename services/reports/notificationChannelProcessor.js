@@ -79,7 +79,10 @@ const findAlertEmailsForAccount = async (accountId) => {
   }
 
   // identify orphaned channels (without policies)
-  reporter.orphans = reporter.orphans.concat(notificationChannels.filter(c => c.associatedPolicies.totalCount === 0));
+  reporter.orphans = reporter.orphans.concat(notificationChannels.filter(c => c.associatedPolicies.totalCount === 0).map(c => {
+    c.accountId = accountId;
+    return c;
+  }));
   
   console.log('email channels', Object.keys(reporter.emails).length);
   console.log('users', Object.keys(reporter.users).length);
