@@ -7,6 +7,7 @@ class DashboardWidget {
     this.id = widgetObj.id;
     this.title = widgetObj.title;
     this.rawConfiguration = widgetObj.rawConfiguration;
+    this.linkedEntities = widgetObj.linkedEntities;
     if (widgetObj.layout) {
       this.layout = {
         column: widgetObj.layout.column,
@@ -15,6 +16,14 @@ class DashboardWidget {
         width: widgetObj.layout.width,
       }
     }
+  }
+
+  linkedEntityGuidsForMutation() {
+    if(this.linkedEntities) {
+      const guidArray = this.linkedEntities.map(e => e.guid);
+      return `linkedEntityGuids: ${JSON.stringify(guidArray)}`;
+    }
+    return 'linkedEntityGuids: null';
   }
 
   toUpdateNerdGraph() {
@@ -38,10 +47,11 @@ class DashboardWidget {
     //     }}};
           return `
           mutation {
-            dashboardUpdateWidgetsInPage(guid: "MTEzNTg4OHxWSVp8REFTSEJPQVJEfDEwODUxMzEw", widgets: {
+            dashboardUpdateWidgetsInPage(guid: "${this.pageId}", widgets: {
               id: "${this.id}", 
               title: "${this.title}", 
               layout: { column: ${this.layout.column}, height: ${this.layout.height}, row: ${this.layout.row}, width: ${this.layout.width}}
+              ${this.linkedEntityGuidsForMutation()}
             }) {
               errors {
                 description

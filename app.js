@@ -41,21 +41,23 @@ const prepareUpdates = (dashboardObj) => {
   let pages = dashboardObj.pages || [];
   for(let page of pages) {
     console.log(`Processing page: ${page.name} (${page.guid})`);
-    let widgets = page.widgets || [];
-    for(let widget of widgets ) {
-      const queries = widget.rawConfiguration?.nrqlQueries || [];
-      let query = queries[0];
-      let accountIds = query?.accountIds || [query?.accountId];
-      if(accountIds.includes(oldAccountId)) {
-        console.log(`widget needs updating id: ${widget.id}`, accountIds, oldAccountId);
-        // time to modify this widget 
-        const myWidget = new DashboardWidget(dashboardId, page.guid, widget);
-
-        // console.log(myWidget.toUpdateNerdGraph());
-      }
-    }
+    checkWidgetsForUpdate(page.guid, page.widgets);
   }
   return [];
+}
+
+const checkWidgetsForUpdate = (pageGuid, widgets = []) => {
+  for(let widget of widgets ) {
+    const queries = widget.rawConfiguration?.nrqlQueries || [];
+    let query = queries[0];
+    let accountIds = query?.accountIds || [query?.accountId];
+    if(accountIds.includes(oldAccountId)) {
+      console.log(`widget needs updating id: ${widget.id}`, accountIds, oldAccountId);
+      // time to modify this widget 
+      const myWidget = new DashboardWidget(dashboardId, pageGuid, widget);
+      console.log(myWidget.toUpdateNerdGraph());
+    }
+  }
 }
 
 run();
