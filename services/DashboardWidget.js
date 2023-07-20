@@ -8,12 +8,28 @@ class DashboardWidget {
     this.title = widgetObj.title;
     this.rawConfiguration = widgetObj.rawConfiguration;
     this.linkedEntities = widgetObj.linkedEntities;
+    this.visualization = widgetObj.visualization;
     if (widgetObj.layout) {
       this.layout = {
         column: widgetObj.layout.column,
         height: widgetObj.layout.height,
         row: widgetObj.layout.row,
         width: widgetObj.layout.width,
+      }
+    }
+  }
+
+  replaceAccount(oldId, newId) {
+    const queries = this.rawConfiguration?.nrqlQueries || [];
+    for(let query of queries) {
+      if(query.accountId === oldId) {
+        console.log('kkkkk replace string');
+        query.accountId = newId;
+      }
+      if(query.accountIds) {
+        const oldIndex = query.accountIds.indexOf(oldId);
+        console.log('kkkkk replace array');
+        query.accountIds[oldIndex] = newId;
       }
     }
   }
@@ -45,13 +61,20 @@ class DashboardWidget {
     //         }
     //       }
     //     }}};
+
+    ///mutation {
+    ///  dashboardUpdateWidgetsInPage(widgets: {id: "", layout: {column: 0, height: 0, row: 0, width: 0}, title: "", visualization: {id: ""}, rawConfiguration: "", linkedEntityGuids: ["345,5678"]}, guid: "")
+    ///}
+
           return `
           mutation {
             dashboardUpdateWidgetsInPage(guid: "${this.pageId}", widgets: {
               id: "${this.id}", 
               title: "${this.title}", 
-              layout: { column: ${this.layout.column}, height: ${this.layout.height}, row: ${this.layout.row}, width: ${this.layout.width}}
               ${this.linkedEntityGuidsForMutation()}
+              layout: { column: ${this.layout.column}, height: ${this.layout.height}, row: ${this.layout.row}, width: ${this.layout.width}},
+              rawConfiguration: ${JSON.stringify(this.rawConfiguration)},
+              visualization: ${this.visualization}
             }) {
               errors {
                 description
