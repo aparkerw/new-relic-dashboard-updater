@@ -65,6 +65,7 @@ const getDashboard = async (dashboardGuid, bPrintJSON = false) => {
           name
           permissions
           pages {
+            guid
             name
             description
             widgets {
