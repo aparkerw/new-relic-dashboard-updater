@@ -102,4 +102,23 @@ const getDashboard = async (dashboardGuid, bPrintJSON = false) => {
 }
 
 
-export default { runNRQL, getDashboard };
+const dashboardUpdateWidgetsInPage = async (graphql, bPrintGraphql = false) => {
+
+  if (bPrintGraphql) {
+    console.log(graphql);
+  }
+  var resp;
+  resp = await axios({
+    url: 'https://api.newrelic.com/graphql',
+    method: 'post',
+    headers: headers(),
+    data: graphql
+  }).catch((e) => {
+    console.log('GraphQL dashboard page widget update error:', e.message);
+    return false;
+  });
+  return true;
+}
+
+
+export default { runNRQL, getDashboard, dashboardUpdateWidgetsInPage };

@@ -1,4 +1,4 @@
-import { jsonToGraphQLQuery } from 'json-to-graphql-query';
+import GraphQLConverter from '../helpers/GraphQLConverter.js';
 
 class DashboardWidget {
   constructor(dashboardId, pageId, widgetObj) {
@@ -21,12 +21,12 @@ class DashboardWidget {
 
   replaceAccount(oldId, newId) {
     const queries = this.rawConfiguration?.nrqlQueries || [];
-    for(let query of queries) {
-      if(query.accountId === oldId) {
+    for (let query of queries) {
+      if (query.accountId === oldId) {
         console.log('kkkkk replace string');
         query.accountId = newId;
       }
-      if(query.accountIds) {
+      if (query.accountIds) {
         const oldIndex = query.accountIds.indexOf(oldId);
         console.log('kkkkk replace array');
         query.accountIds[oldIndex] = newId;
@@ -35,7 +35,7 @@ class DashboardWidget {
   }
 
   linkedEntityGuidsForMutation() {
-    if(this.linkedEntities) {
+    if (this.linkedEntities) {
       const guidArray = this.linkedEntities.map(e => e.guid);
       return `linkedEntityGuids: ${JSON.stringify(guidArray)}`;
     }
@@ -66,25 +66,26 @@ class DashboardWidget {
     ///  dashboardUpdateWidgetsInPage(widgets: {id: "", layout: {column: 0, height: 0, row: 0, width: 0}, title: "", visualization: {id: ""}, rawConfiguration: "", linkedEntityGuids: ["345,5678"]}, guid: "")
     ///}
 
-          return `
+    return `
           mutation {
             dashboardUpdateWidgetsInPage(guid: "${this.pageId}", widgets: {
               id: "${this.id}", 
               title: "${this.title}", 
               ${this.linkedEntityGuidsForMutation()}
               layout: { column: ${this.layout.column}, height: ${this.layout.height}, row: ${this.layout.row}, width: ${this.layout.width}},
-              rawConfiguration: ${JSON.stringify(this.rawConfiguration)},
-              visualization: ${this.visualization}
+              rawConfiguration: ${GraphQLConverter.ObjectToGraphQl(this.rawConfiguration)},
+              visualization: ${GraphQLConverter.ObjectToGraphQl(this.visualization)}
             }) {
               errors {
                 description
                 type
               }
             }
+          }
           `;
-          //return jsonToGraphQLQuery(mutation, { pretty: true });
-          //return JSON.stringify(this);
-        }
-      };
+    //return jsonToGraphQLQuery(mutation, { pretty: true });
+    //return JSON.stringify(this);
+  }
+};
 
-      export default DashboardWidget;
+export default DashboardWidget;

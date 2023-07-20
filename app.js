@@ -15,7 +15,7 @@ let newAccountId = 3136945;
 const dashboardId = 'MTEzNTg4OHxWSVp8REFTSEJPQVJEfGRhOjQwMTA2Mzk'; // WLS_Digital_Dashboard-Adam-I https://onenr.io/0qQa5VlxPQ1
 
 const run = async () => {
-  let dashboardObj = await loadDashboard(false);
+  let dashboardObj = await loadDashboard(true);
   let updates = await prepareUpdates(dashboardObj);
 }
 
@@ -51,8 +51,10 @@ const checkWidgetsForUpdate = async (pageGuid, widgets = []) => {
       if(fix === 'y' || fix === 'yes') {
         const myWidget = new DashboardWidget(dashboardId, pageGuid, widget);
         myWidget.replaceAccount(oldAccountId, newAccountId);
+        console.log('----- previous ----');
         console.log(JSON.stringify(widget, null, 2));
-        console.log(myWidget.toUpdateNerdGraph());
+        console.log('------- new ------');
+        await NerdGraphService.dashboardUpdateWidgetsInPage(myWidget.toUpdateNerdGraph(), true);
       } else {
         console.log('skipping');
       }
