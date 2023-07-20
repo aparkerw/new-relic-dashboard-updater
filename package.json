@@ -16,7 +16,8 @@
     "dayjs": "^1.11.8",
     "dotenv": "^16.1.4",
     "express": "^4.18.2",
-    "json-to-graphql-query": "^2.2.5"
+    "json-to-graphql-query": "^2.2.5",
+    "prompt": "^1.3.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
