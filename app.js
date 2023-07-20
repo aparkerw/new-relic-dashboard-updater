@@ -1,88 +1,61 @@
 import "dotenv/config.js";
-import NRQLService from "./services/NRQLService.js";
+import * as fs from 'fs';
 import NerdGraphService from "./services/NerdGraphService.js";
 import { MetricNames, SinceTimeRange, SeriesIntervalTimeRange, AggregateFunctions } from "./Variables.js";
-import notificationChannelProcessor from "./services/reports/notificationChannelProcessor.js";
+import NRQLService from "./services/NRQLService.js";
+import DashboardWidget from "./services/DashboardWidget.js";
+
+let oldAccountId = 2255127;
+let newAccountId = 3136945;
+
+  // const dashboardId = 'MTEzNTg4OHxWSVp8REFTSEJPQVJEfGRhOjM5MDE3ODY'; // B360-Quote-Adam
+  // const dashboardId = 'Mjk1Mjc2OHxWSVp8REFTSEJPQVJEfGRhOjM5MzM1Njk'; // testing account dashboard
+  // const dashboardId = 'MzA1ODgxNnxWSVp8REFTSEJPQVJEfGRhOjE0MzA4MjE'; // WLS_Digital_Dashboard https://onenr.io/0oQDK37GDjy
+  const dashboardId = 'MTEzNTg4OHxWSVp8REFTSEJPQVJEfGRhOjQwMTA2Mzk'; // WLS_Digital_Dashboard-Adam-I https://onenr.io/0qQa5VlxPQ1
+
+/* mutation {
+  dashboardUpdateWidgetsInPage(guid: "MTEzNTg4OHxWSVp8REFTSEJPQVJEfDEwODUxMzEw", widgets: {
+    id: "161963911", 
+    title: "Browser Hits", 
+    configuration: {billboard: {nrqlQueries: {accountId: 3136945, query: "SELECT count(*) AS 'Hits' FROM BrowserInteraction where duration IS NOT NULL where appName like 'B2B_Quick_Quote_Prod' Where targetUrl LIKE '%ui/quick-quote/#/%' AND targetUrl  NOT LIKE '%sqa%' AND targetUrl  NOT LIKE '%nsq%' AND targetUrl  NOT LIKE '%prj%' AND targetUrl NOT LIKE '%localhost%'  and targetUrl NOT LIKE '%train%' and targetUrl NOT LIKE '%nssit%' limit max COMPARE WITH 1 day ago"}}},
+    layout: {column: 1, height: 2, row: 1, width: 2}
+  }) {
+    errors {
+      description
+      type
+    }
+  }
+} */
 
 const run = async () => {
-  let accounts = await NerdGraphService.getAccounts();
-  console.log(accounts);
+  let dashboardObj = await loadDashboard(true);
+  let updates = prepareUpdates(dashboardObj);
+}
 
-  // const emails = { };
-  const emails = {};
-  
-  // for(const account of accounts.slice(2,7)) {
-  for(const account of accounts) {
-    console.log("Processing reports for account", account.name);
-    let accountId = account.id;
-    // let policies = await NerdGraphService.getAlertPolicies(accountId);
-    // console.log(policies);
-    // for(const policy of policies) {
-    //   // let policyDetails = await NerdGraphService.getAlertPolicyDetails(accountId, policy.id);
-    //   // console.log(policyDetails);
-    // }
+const loadDashboard = async (bPrintJSON = false) => {
+  let dashboardObj = await NerdGraphService.getDashboard(dashboardId, bPrintJSON);
+  return dashboardObj;
+}
 
+const prepareUpdates = (dashboardObj) => {
+  let pages = dashboardObj.pages || [];
+  for(let page of pages) {
+    console.log(`Processing page: ${page.name} (${page.guid})`);
+    let widgets = page.widgets || [];
+    for(let widget of widgets ) {
+      const queries = widget.rawConfiguration?.nrqlQueries || [];
+      let query = queries[0];
+      let accountIds = query?.accountIds || [query?.accountId];
+      if(accountIds.includes(oldAccountId)) {
+        console.log(`widget needs updating id: ${widget.id}`, accountIds, oldAccountId);
+        // time to modify this widget 
+        const myWidget = new DashboardWidget(dashboardId, page.guid, widget);
 
-    await notificationChannelProcessor.run(accountId);
-    
-  }
-    
-  
-  // add the email channels to our email destination check
-  for(const ec of Object.values(notificationChannelProcessor.reporter.emails)) {
-    if (!emails[ec.key]) {
-      emails[ec.key] = ec.policyIds;
-    }
-    else {
-      emails[ec.key] = emails[ec.key].concat(ec.policyIds);
+        // console.log(myWidget.toUpdateNerdGraph());
+      }
     }
   }
-
-  // add the user channels to our email destination check
-  for(const uc of Object.values(notificationChannelProcessor.reporter.users)) {
-    if (!emails[uc.key]) {
-      emails[uc.key] = uc.policyIds;
-    }
-    else {
-      emails[uc.key] = emails[uc.key].concat(uc.policyIds);
-    }
-  }
-  
-  console.log(emails);
-
-  console.log('\n===============================\n');
-
-  // let's output the emails that are on the same policy twice
-  console.log("Emails on one policy twice");
-  let offenders = [];
-  for (const [key, value] of Object.entries(emails)) {
-    const duplicates = value.filter((item, index) => value.indexOf(item) !== index);
-    if(duplicates.length > 0) {
-      offenders.push({ key, duplicates});
-    }
-  }
-  console.log(offenders);
-  
-  console.log('\n===============================\n');
-
-  console.log("Orphaned Channels (channels without a policy)");
-  console.log(notificationChannelProcessor.reporter.orphans.map((o) => {
-    return { name: o.name, type: o.type, accountId: o.accountId };
-  }));
-
-  console.log('\n===============================\n');
-
-  console.log("Orphaned Channels NON USER (channels without a policy)");
-  console.log(JSON.stringify(notificationChannelProcessor.reporter.orphans.filter(o => o.type !== 'USER').map((o) => {
-    return { name: o.name, type: o.type, accountId: o.accountId };
-  })));
-
-  console.log('\n===============================\n');
-
-  console.log("User Channels to not migrate");
-  console.log(JSON.stringify(Object.values(notificationChannelProcessor.reporter.users).map((u) => {
-    return { name: u.name, email: u.email, policyIds: u.policyIds, accountid: u.accountId };
-  })));
+  return [];
 }
 
 run();

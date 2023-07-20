@@ -55,9 +55,34 @@ const getAccounts = async () => {
   return resp?.data?.data?.actor?.accounts;
 }
 
-const getAlertPolicies = async (accountId) => {
+const getDashboard = async (dashboardGuid, bPrintJSON = false) => {
 
-  var graphql = { query: `{\n  actor {\n    account(id: ${accountId}) {\n      alerts {\n        policiesSearch {\n          nextCursor\n          policies {\n            id\n            accountId\n            incidentPreference\n            name\n          }\n        }\n      }\n    }\n  }\n}`, variables: null };
+  var graphql = { query: 
+  `{
+    actor {
+      entity(guid: "${dashboardGuid}") {
+        ... on DashboardEntity {
+          name
+          permissions
+          pages {
+            name
+            description
+            widgets {
+              id
+              visualization { id }
+              title
+              layout { row width height column }
+              rawConfiguration
+              linkedEntities {
+                guid
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
+  , variables: null };
 
   var resp;
   resp = await axios({
@@ -67,47 +92,13 @@ const getAlertPolicies = async (accountId) => {
     data: graphql
   }).catch((e) => {
     console.log('GraphQL account lookup error:', e.message);
-  });
-
-  return resp?.data?.data?.actor?.account?.alerts?.policiesSearch?.policies;
-}
-
-const getNotificationChannels = async (accountId, cursor) => {
-
-  var graphql = { query: `{\n  actor {\n    account(id: ${accountId}) {\n      alerts {\n        notificationChannels${cursor ? `(cursor:"${cursor}")` : ''} {\n          nextCursor\n          totalCount\n          channels {\n            id\n            name\n            type\n            associatedPolicies {\n              policies {\n                id\n                name\n              }\n              totalCount\n            }\n          }\n          nextCursor\n        }\n      }\n    }\n  }\n}\n`, variables: null };
-
-  var resp;
-  resp = await axios({
-    url: 'https://api.newrelic.com/graphql',
-    method: 'post',
-    headers: headers(),
-    data: graphql
-  }).catch((e) => {
-    console.log('GraphQL account lookup error:', e.message);
-  });
-
-  const alerts = resp?.data?.data?.actor?.account?.alerts;
-  const notificationChannels = alerts?.notificationChannels;
-  const nextCursor = notificationChannels?.nextCursor;
-
-  console.log('next cursor', nextCursor);
-  console.log('loaded: ', notificationChannels?.channels.length);
-  console.log('total channels', notificationChannels?.totalCount);
-
-  let channels = notificationChannels?.channels || [];
-
-  if (nextCursor) {
-    let newChannels = await getNotificationChannels(accountId, nextCursor);
-    channels.concat(newChannels);
+  })
+  if (bPrintJSON) {
+    console.log('dashboard', JSON.stringify(resp?.data, null, 2));
   }
 
-
-  return channels;
+  return resp.data?.data?.actor?.entity;
 }
 
 
-
-
-
-
-export default { runNRQL, getAccounts, getAlertPolicies, getNotificationChannels };
+export default { runNRQL, getDashboard };
