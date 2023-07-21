@@ -12,7 +12,7 @@ let newAccountId = 3136945;
 const dashboardId = process.env.TARGET_DASHBOARD_ID;
 
 const run = async () => {
-  let dashboardObj = await loadDashboard(true);
+  let dashboardObj = await loadDashboard(false);
   let updates = await prepareUpdates(dashboardObj);
 }
 
@@ -38,14 +38,14 @@ const checkWidgetsForUpdate = async (pageGuid, widgets = []) => {
     if (accountIds.includes(oldAccountId)) {
       console.log(`widget needs updating id: ${widget.id}`, accountIds, oldAccountId);
       const {fix} = await prompt.get({
-        description: 'would you like to fix (y/n)', 
+        description: 'would you like to fix (y/n/enter)', 
         type: 'string', 
         validator: /y[es]*|n[o]?/,
         name: 'fix'
       }, ['fix']);
       // console.log('rrr', fix);
       // time to modify this widget 
-      if(fix === 'y' || fix === 'yes') {
+      if(fix === 'y' || fix === 'yes' || fix === '') {
         const myWidget = new DashboardWidget(dashboardId, pageGuid, widget);
         myWidget.replaceAccount(oldAccountId, newAccountId);
         console.log('----- previous ----');

@@ -107,11 +107,11 @@ const dashboardUpdateWidgetsInPage = async (graphql, bPrintGraphql = false) => {
   if (bPrintGraphql) {
     console.log(graphql);
   }
-
-  axios.interceptors.request.use(request => {
-    console.log('Starting Request', JSON.stringify(request, null, 2))
-    return request
-  })
+  // // uncomment the below for logging of the request
+  // axios.interceptors.request.use(request => {
+  //   console.log('Starting Request', JSON.stringify(request, null, 2))
+  //   return request
+  // })
 
   var resp = await axios({
     url: 'https://api.newrelic.com/graphql',
