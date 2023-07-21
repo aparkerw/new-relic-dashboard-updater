@@ -1,10 +1,12 @@
 # WORK IN PROGRESS
 
-**This project is in development and will be changing to provide common cross-account query examples and to make modification for any future use case easer to implement**
+**This project serves as a way to programatically make changes to a dashboard without having to go through the UI**
 
-# NRQL + Nerdgraph Sample Application
+# Dashboard Editor
 
-The purpose of this applicaiton is to showcase the ability execute nerdgraph queries accross multiple account that a user is associated with.
+This script will load the dashboard provided and will iterate over the pages and widgets.
+
+As a start this script will look for older AccountId values and update those widgets with a new accountId, making the change in place via the NerdGraph endpoints.
 
 https://developer.newrelic.com/build-apps/add-nerdgraphquery-guide/
 
@@ -38,20 +40,11 @@ You can run this inline via the command:
 npm start
 ```
 
+You will be prompted for each widget change.
+
 If you choose to add your key inline instead of via the `.env` file you can run:
 
 ```
 NEW_RELIC_API_KEY=NRAK-ABCDABCDABCD npm start
 ```
-
-
-## Architecture
-
-### NRQL Service
-
-The NRQL service is designed to create various types of NRQL valid queries that fit into defined paradigms.  That way, for example, asking for the timeseries of several metrics can be done with a single function call with a few different perameters.
-
-### NerdGraph Services
-
-The purpose of the nerdgraph service is to call the New Relic Graph APIs with the NRQL from the service above and to format the response for easy use within a dashboard.
 

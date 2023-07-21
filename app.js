@@ -9,10 +9,7 @@ import DashboardWidget from "./services/DashboardWidget.js";
 let oldAccountId = 2255127;
 let newAccountId = 3136945;
 
-// const dashboardId = 'MTEzNTg4OHxWSVp8REFTSEJPQVJEfGRhOjM5MDE3ODY'; // B360-Quote-Adam
-// const dashboardId = 'Mjk1Mjc2OHxWSVp8REFTSEJPQVJEfGRhOjM5MzM1Njk'; // testing account dashboard
-// const dashboardId = 'MzA1ODgxNnxWSVp8REFTSEJPQVJEfGRhOjE0MzA4MjE'; // WLS_Digital_Dashboard https://onenr.io/0oQDK37GDjy
-const dashboardId = 'MTEzNTg4OHxWSVp8REFTSEJPQVJEfGRhOjQwMTA2Mzk'; // WLS_Digital_Dashboard-Adam-I https://onenr.io/0qQa5VlxPQ1
+const dashboardId = process.env.TARGET_DASHBOARD_ID;
 
 const run = async () => {
   let dashboardObj = await loadDashboard(true);
