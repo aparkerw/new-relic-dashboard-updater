@@ -107,12 +107,17 @@ const dashboardUpdateWidgetsInPage = async (graphql, bPrintGraphql = false) => {
   if (bPrintGraphql) {
     console.log(graphql);
   }
-  var resp;
-  resp = await axios({
+
+  axios.interceptors.request.use(request => {
+    console.log('Starting Request', JSON.stringify(request, null, 2))
+    return request
+  })
+
+  var resp = await axios({
     url: 'https://api.newrelic.com/graphql',
     method: 'post',
     headers: headers(),
-    data: graphql
+    data: JSON.stringify({"query": graphql})
   }).catch((e) => {
     console.log('GraphQL dashboard page widget update error:', e.message);
     return false;
