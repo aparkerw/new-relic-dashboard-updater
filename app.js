@@ -6,8 +6,9 @@ import { MetricNames, SinceTimeRange, SeriesIntervalTimeRange, AggregateFunction
 import NRQLService from "./services/NRQLService.js";
 import DashboardWidget from "./services/DashboardWidget.js";
 
-let oldAccountId = 2255127;
-let newAccountId = 3136945;
+let oldAccountId = 2255127; // Verizon_VCIT_WLS_PR
+let newAccountId = 3136945; // Verizon_VSIT_SOE_PR
+// let newAccountId = 3871476; // Verizon_BVIT_BVO6_PR
 
 const dashboardId = process.env.TARGET_DASHBOARD_ID;
 
