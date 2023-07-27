@@ -36,7 +36,8 @@ const checkWidgetsForUpdate = async (pageGuid, widgets = []) => {
     let query = queries[0];
     let accountIds = query?.accountIds || [query?.accountId];
     if (accountIds.includes(oldAccountId)) {
-      console.log(`widget needs updating id: ${widget.id}`, accountIds, oldAccountId);
+      console.log(`\nWidget needs updating id: ${widget.id}  current account Ids: ${accountIds} we found the old accountId: ${oldAccountId}`);
+      console.log(`   -- current account Ids: ${accountIds} we found the old accountId: ${oldAccountId}`);
       const {fix} = await prompt.get({
         description: 'would you like to fix (y/n/enter)', 
         type: 'string', 
