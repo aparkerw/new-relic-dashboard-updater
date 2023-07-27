@@ -47,9 +47,10 @@ const checkWidgetsForUpdate = async (pageGuid, widgets = []) => {
       // time to modify this widget 
       if(fix === 'y' || fix === 'yes' || fix === '') {
         const myWidget = new DashboardWidget(dashboardId, pageGuid, widget);
-        myWidget.replaceAccount(oldAccountId, newAccountId);
         console.log('----- previous ----');
         console.log(JSON.stringify(widget, null, 2));
+
+        myWidget.replaceAccount(oldAccountId, newAccountId);
         console.log('------- new ------');
         await NerdGraphService.dashboardUpdateWidgetsInPage(myWidget.toUpdateNerdGraph(), true);
       } else {
