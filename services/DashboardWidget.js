@@ -23,13 +23,19 @@ class DashboardWidget {
     const queries = this.rawConfiguration?.nrqlQueries || [];
     for (let query of queries) {
       if (query.accountId === oldId) {
-        console.log('kkkkk replace string');
         query.accountId = newId;
-      }
-      if (query.accountIds) {
+      } else if (query.accountIds) {
         const oldIndex = query.accountIds.indexOf(oldId);
-        console.log('kkkkk replace array');
-        query.accountIds[oldIndex] = newId;
+        // cut out the old
+        query.accountIds.splice(oldIndex, 1);
+        const newIndex = query.accountIds.indexOf(newId);
+        if(newIndex === -1) {
+          // add in the new
+          query.accountIds.push(newId);
+        } else {
+          console.warn('******* new account id already in the array, so no need to add');
+          // do nothing
+        }
       }
     }
   }
